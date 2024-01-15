@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	m "models"
 	"net"
+	"os"
 )
 
 func main() {
@@ -18,32 +21,43 @@ func main() {
 
 	// Accepte les connexions entrantes de manière asynchrone
 	for {
+		var client m.Client
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Erreur lors de l'acceptation de la connexion:", err)
 			continue
 		}
+		client.Conn = conn
+
+		reader := bufio.NewReader(os.Stdin)
+
+		fmt.Print("Entrez votre nom : ")
+		name, err := reader.ReadString('\n')
+		if err != nil || name == "" {
+			fmt.Println("Erreur lors de l'entrée du nom !")
+		}
+		client.Name = name
 
 		fmt.Println("Nouvelle connexion établie!")
 
 		// Traitez la connexion dans une goroutine séparée
-		go handleConnection(conn)
+		go handleConnection(client)
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func handleConnection(client m.client) {
 	// Code pour traiter la connexion
-	defer conn.Close()
+	defer client.Conn.Close()
 
 	// Exemple: lire les données de la connexion
 	buffer := make([]byte, 1024)
 	for {
-		_, err := conn.Read(buffer)
+		_, err := client.Conn.Read(buffer)
 		if err != nil {
 			fmt.Println("Un client a quitté le chat !")
 			return
 		}
-	
+
 		fmt.Println("Données reçues:", string(buffer))
 	}
 }
