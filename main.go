@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	m "models"
+	m "netCat/models"
 	"net"
 	"os"
 )
@@ -38,14 +38,14 @@ func main() {
 		}
 		client.Name = name
 
-		fmt.Println("Nouvelle connexion établie!")
+		fmt.Printf("Nouvelle connexion établie de : %v!\n", client.Name)
 
 		// Traitez la connexion dans une goroutine séparée
 		go handleConnection(client)
 	}
 }
 
-func handleConnection(client m.client) {
+func handleConnection(client m.Client) {
 	// Code pour traiter la connexion
 	defer client.Conn.Close()
 
